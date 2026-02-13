@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#fdf2f8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>💖 Be My Valentine?</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Floating hearts background layer -->
+  <div class="hearts-bg" id="heartsBg" aria-hidden="true"></div>
+
+  <!-- Ambient particle layer -->
+  <div class="particles" id="particles" aria-hidden="true"></div>
+
+  <!-- Main card -->
+  <main class="card" id="mainCard">
+    <div class="card__deco card__deco--tl"></div>
+    <div class="card__deco card__deco--br"></div>
+
+    <div class="card__heart-icon" aria-hidden="true">💖</div>
+    <h1 class="card__title" id="questionText">Will you be my Valentine?</h1>
+    <p class="card__sub">💖</p>
+
+    <div class="card__buttons" id="buttonWrap">
+      <button class="btn btn--yes" id="btnYes" type="button">YES 💕</button>
+      <button class="btn btn--no"  id="btnNo"  type="button">NO 💔</button>
+    </div>
+  </main>
+
+  <!-- Sad cat gif portal (hidden by default, img injected by JS) -->
+  <div class="sadcat-portal" id="sadcatPortal" aria-hidden="true"></div>
+
+  <!-- YES celebration screen (hidden by default) -->
+  <section class="celeb" id="celebScreen" aria-hidden="true">
+    <div class="celeb__hearts" id="celebHearts" aria-hidden="true"></div>
+    <div class="celeb__content">
+      <div class="celeb__dance-container" id="celebDanceContainer" aria-hidden="true">
+        <div class="celeb__glow-hearts" id="celebGlowHearts" aria-hidden="true"></div>
+        <img src="PNG/dance.gif" class="celeb__dance-gif" id="celebDanceGif" alt="Dancing celebration" />
+      </div>
+      <h2 class="celeb__title" id="celebTitle"><strong>හී හී 😁💕</strong></h2>
+      <p  class="celeb__msg"  id="celebMsg" >I knew you'd say yes!</p>
+      <button class="btn btn--gift" id="btnGift" type="button">මෙතන Click කරන්න 🎁</button>
+    </div>
+    <p class="celeb__tap">Tap anywhere to spawn hearts ✨</p>
+  </section>
+
+  <!-- Gift Sequence Screen -->
+  <section class="gift-screen" id="giftScreen" aria-hidden="true">
+    <div class="gift-bg-animations" id="giftBgAnimations"></div>
+    <div class="gift-container" id="giftContainer">
+      <!-- Flower Bouquet -->
+      <img src="PNG/Flowerbouque.png" class="gift-item" id="bouquet" alt="Flower Bouquet" />
+      
+      <!-- Bouquet Message (appears near bouquet) -->
+      <div class="bouquet-message" id="bouquetMessage">
+        <p>මේක ඔයාට මගෙන් 😌🌹</p>
+      </div>
+      
+      <button class="btn btn--next-gift" id="btnNextGift1" type="button">Next Gift 💝</button>
+      
+      <!-- Gift Box (clickable) -->
+      <img src="PNG/giftbox.png" class="gift-item" id="giftbox" alt="Gift Box" />
+      
+      <!-- Message Box (instruction for giftbox) -->
+      <div class="message-box" id="messageBox">
+        <p>Click on it! 👆</p>
+      </div>
+      
+      <!-- Chocolate 1 (clickable) -->
+      <img src="PNG/choco1.png" class="gift-item" id="choco1" alt="Chocolate 1" />
+      
+      <!-- Choco1 Message (instruction for choco1) -->
+      <div class="choco-message" id="choco1Message">
+        <p>Click here 👆</p>
+      </div>
+      
+      <!-- Chocolate 2 (clickable) -->
+      <img src="PNG/choco2.png" class="gift-item" id="choco2" alt="Chocolate 2" />
+      
+      <!-- Choco2 Message (instruction for choco2) -->
+      <div class="choco-message" id="choco2Message">
+        <p>Click here 👆</p>
+      </div>
+      
+      <!-- Envelope (clickable) -->
+      <img src="PNG/envelope.png" class="gift-item" id="envelope" alt="Envelope" />
+      
+      <!-- Envelope Message (instruction for envelope) -->
+      <div class="envelope-message" id="envelopeMessage">
+        <p>Open it! 💌</p>
+      </div>
+      
+      <!-- Final Message - Paper Note -->
+      <div class="final-message" id="finalMessage">
+        <div class="paper-note">
+          <div class="paper-lines"></div>
+          <div class="paper-content">
+            <p class="love-text" id="loveText"></p>
+            <p class="signature">Your dear love ❤️</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
