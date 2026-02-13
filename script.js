@@ -17,7 +17,6 @@
   const celebScreen  = document.getElementById('celebScreen');
   const celebHearts  = document.getElementById('celebHearts');
   const giftScreen   = document.getElementById('giftScreen');
-  const treeScreen   = document.getElementById('treeScreen');
 
   /* ─── Config ─── */
   const HEART_EMOJIS  = ['💖','💗','💓','💞','💝','🌹','✨'];
@@ -47,57 +46,54 @@
   const MAX_HISTORY = 3; // Remember last 3 gifs shown
 
   /* ─── Preload GIFs and images in background ─── */
-  // Store preloaded GIF objects for instant access
-  var preloadedGifs = {};
-  var gifsLoaded = 0;
-  var totalGifs = SADCAT_GIFS.length;
+  const preloadedGifs = {}; // Store references to preloaded GIF elements
   
   (function preloadAssets() {
-    // Preload sad cat GIFs - keep them in memory for instant playback
-    SADCAT_GIFS.forEach(function(gifPath) {
-      const img = new Image();
-      
-      img.onload = function() {
-        // Store the fully loaded image object
-        preloadedGifs[gifPath] = img;
-        gifsLoaded++;
-        
-        // Optional: log when all GIFs are loaded
-        if (gifsLoaded === totalGifs) {
-          console.log('✅ All sadcat GIFs preloaded and ready!');
-        }
-      };
-      
-      img.onerror = function() {
-        console.warn('⚠️ Failed to load:', gifPath);
-      };
-      
-      // Start loading
+    // Create a hidden container for preloading GIFs
+    const preloadContainer = document.createElement('div');
+    preloadContainer.style.position = 'absolute';
+    preloadContainer.style.left = '-9999px';
+    preloadContainer.style.top = '-9999px';
+    preloadContainer.style.width = '1px';
+    preloadContainer.style.height = '1px';
+    preloadContainer.style.overflow = 'hidden';
+    preloadContainer.style.pointerEvents = 'none';
+    preloadContainer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(preloadContainer);
+    
+    // Preload sad cat GIFs - create hidden img elements that start animating immediately
+    SADCAT_GIFS.forEach(function(gifPath, index) {
+      const img = document.createElement('img');
       img.src = gifPath;
+      img.style.width = '120px';
+      img.style.height = '120px';
+      img.style.display = 'block';
+      preloadContainer.appendChild(img);
+      
+      // Store reference for later use
+      preloadedGifs['sadcat_' + index] = img;
     });
     
-    // Preload dance.gif for celebration screen
-    const danceImg = new Image();
+    // Preload dance.gif - create hidden element
+    const danceImg = document.createElement('img');
     danceImg.src = 'PNG/dance.gif';
-    danceImg.onload = function() {
-      preloadedGifs['PNG/dance.gif'] = danceImg;
-    };
+    danceImg.style.display = 'block';
+    preloadContainer.appendChild(danceImg);
+    preloadedGifs['dance'] = danceImg;
     
-    // Preload gift images
-    const bouquetImg = new Image();
-    bouquetImg.src = 'PNG/Flowerbouque.png';
+    // Preload static images (these don't need to animate)
+    const staticImages = [
+      'PNG/Flowerbouque.png',
+      'PNG/giftbox.png',
+      'PNG/choco1.png',
+      'PNG/choco2.png',
+      'PNG/envelope.png'
+    ];
     
-    const giftboxImg = new Image();
-    giftboxImg.src = 'PNG/giftbox.png';
-    
-    const choco1Img = new Image();
-    choco1Img.src = 'PNG/choco1.png';
-    
-    const choco2Img = new Image();
-    choco2Img.src = 'PNG/choco2.png';
-    
-    const envelopeImg = new Image();
-    envelopeImg.src = 'PNG/envelope.png';
+    staticImages.forEach(function(imgPath) {
+      const img = new Image();
+      img.src = imgPath;
+    });
   })();
 
   /* ─── 1. Background Floating Hearts ─── */
@@ -306,18 +302,21 @@
     var oldText = sadcatPortal.querySelector('.sadcat-text');
     if (oldText) oldText.remove();
 
-    /* Use preloaded image for instant playback, fallback to new image if not loaded yet */
-    var img = document.createElement('img');
-    img.className = 'sadcat-portal__img';
-    img.alt = 'Sad cat';
+    /* Clone the preloaded GIF element (already animating in background) */
+    var preloadedImg = preloadedGifs['sadcat_' + randomIndex];
+    var img;
     
-    // If GIF is preloaded, clone it for instant playback
-    if (preloadedGifs[gif]) {
-      // Use the preloaded image's src (already in browser cache)
-      img.src = preloadedGifs[gif].src;
+    if (preloadedImg) {
+      // Clone the already-playing GIF
+      img = preloadedImg.cloneNode(true);
+      img.className = 'sadcat-portal__img';
+      img.alt = 'Sad cat';
     } else {
-      // Fallback: load normally if preload hasn't finished yet
+      // Fallback: create new image (shouldn't happen if preload worked)
+      img = document.createElement('img');
+      img.className = 'sadcat-portal__img';
       img.src = gif;
+      img.alt = 'Sad cat';
     }
 
     /* Text element */
@@ -744,11 +743,6 @@
           if (signature) {
             signature.classList.add('show');
           }
-          
-          // Show Next button 3 seconds after signature appears
-          setTimeout(function() {
-            showNextTreeButton();
-          }, 3000);
         }, 500);
       }
     }, 80);
@@ -857,156 +851,6 @@
 
       setTimeout(spawnGlowHeart, 600 + Math.random() * 800);
     })();
-  }
-
-  /* ─── 9. Next Tree Button ─── */
-  const btnNextTree = document.getElementById('btnNextTree');
-  
-  function showNextTreeButton() {
-    btnNextTree.classList.add('show');
-  }
-
-  btnNextTree.addEventListener('click', onNextTreeClick);
-  btnNextTree.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    onNextTreeClick(e);
-  }, { passive: false });
-
-  function onNextTreeClick() {
-    // Hide gift screen
-    giftScreen.style.opacity = '0';
-    
-    setTimeout(function() {
-      giftScreen.setAttribute('aria-hidden', 'true');
-      giftScreen.style.display = 'none';
-      
-      // Show tree screen
-      treeScreen.style.display = 'flex';
-      treeScreen.setAttribute('aria-hidden', 'false');
-      
-      // Start tree animations
-      startTreeAnimations();
-    }, 800);
-  }
-
-  /* ─── 10. Tree of Love Animations ─── */
-  function startTreeAnimations() {
-    // Start background particles
-    createTreeParticles();
-    
-    // Start heart leaves animation after branches grow
-    setTimeout(function() {
-      animateHeartLeaves();
-    }, 3500);
-    
-    // Start falling petals effect
-    setTimeout(function() {
-      startFallingPetals();
-    }, 5000);
-  }
-
-  /* Create floating background particles for tree screen */
-  function createTreeParticles() {
-    const treeBgParticles = document.getElementById('treeBgParticles');
-    const particleEmojis = ['✨', '🌸', '🌺', '🦋', '🌼', '💫'];
-    
-    for (let i = 0; i < 15; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'tree-particle';
-      particle.textContent = particleEmojis[Math.floor(Math.random() * particleEmojis.length)];
-      
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.top = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 5 + 's';
-      particle.style.animationDuration = (6 + Math.random() * 4) + 's';
-      
-      treeBgParticles.appendChild(particle);
-    }
-  }
-
-  /* Animate heart leaves appearing on the tree */
-  function animateHeartLeaves() {
-    const heartLeaves = document.getElementById('heartLeaves');
-    const heartEmojis = ['❤️', '💕', '💖', '💗', '💓', '💞', '💝', '💘'];
-    
-    // Define heart positions on branches (x, y, delay, rotation)
-    const heartPositions = [
-      // Top branches
-      { x: 150, y: 200, delay: 0, rotate: 15 },
-      { x: 100, y: 180, delay: 0.2, rotate: -10 },
-      { x: 350, y: 180, delay: 0.1, rotate: 20 },
-      { x: 380, y: 200, delay: 0.3, rotate: -15 },
-      
-      // Middle branches
-      { x: 80, y: 280, delay: 0.4, rotate: 25 },
-      { x: 130, y: 260, delay: 0.5, rotate: -20 },
-      { x: 320, y: 260, delay: 0.6, rotate: 18 },
-      { x: 370, y: 280, delay: 0.7, rotate: -25 },
-      { x: 180, y: 250, delay: 0.8, rotate: 10 },
-      { x: 280, y: 250, delay: 0.9, rotate: -12 },
-      
-      // Lower branches
-      { x: 60, y: 360, delay: 1.0, rotate: 30 },
-      { x: 110, y: 340, delay: 1.1, rotate: -18 },
-      { x: 160, y: 320, delay: 1.2, rotate: 22 },
-      { x: 220, y: 310, delay: 1.3, rotate: -15 },
-      { x: 250, y: 300, delay: 1.4, rotate: 12 },
-      { x: 290, y: 310, delay: 1.5, rotate: -20 },
-      { x: 340, y: 320, delay: 1.6, rotate: 25 },
-      { x: 390, y: 340, delay: 1.7, rotate: -22 },
-      { x: 420, y: 360, delay: 1.8, rotate: 28 },
-      
-      // Additional hearts scattered
-      { x: 200, y: 380, delay: 1.9, rotate: -8 },
-      { x: 270, y: 370, delay: 2.0, rotate: 15 },
-      { x: 150, y: 295, delay: 2.1, rotate: -18 },
-      { x: 330, y: 295, delay: 2.2, rotate: 20 },
-      { x: 240, y: 230, delay: 2.3, rotate: -10 },
-    ];
-    
-    heartPositions.forEach(function(pos) {
-      const heart = document.createElement('div');
-      heart.className = 'heart-leaf';
-      heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
-      
-      heart.style.left = pos.x + 'px';
-      heart.style.top = pos.y + 'px';
-      heart.style.animationDelay = pos.delay + 's';
-      heart.style.setProperty('--hover-rotate', pos.rotate + 'deg');
-      
-      // Random sparkle effect on some hearts
-      if (Math.random() > 0.7) {
-        setTimeout(function() {
-          heart.classList.add('sparkle');
-        }, (pos.delay * 1000) + 1500);
-      }
-      
-      heartLeaves.appendChild(heart);
-    });
-  }
-
-  /* Create falling petals effect */
-  function startFallingPetals() {
-    const treeScreen = document.getElementById('treeScreen');
-    const petalEmojis = ['🌸', '🌺', '🌼', '🌹'];
-    
-    setInterval(function() {
-      const petal = document.createElement('div');
-      petal.className = 'falling-petal';
-      petal.textContent = petalEmojis[Math.floor(Math.random() * petalEmojis.length)];
-      
-      petal.style.left = Math.random() * 100 + '%';
-      petal.style.animationDuration = (3 + Math.random() * 2) + 's';
-      petal.style.fontSize = (1 + Math.random() * 0.8) + 'rem';
-      
-      treeScreen.appendChild(petal);
-      
-      petal.addEventListener('animationend', function() {
-        if (petal.parentNode) {
-          petal.parentNode.removeChild(petal);
-        }
-      });
-    }, 800);
   }
 
 })();
